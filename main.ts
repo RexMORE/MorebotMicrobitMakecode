@@ -5,7 +5,7 @@
 /**
  * Functions to operate the the MOREbot Microbit Shield Ports.
  */
-//% weight=3 color=#ED672D icon="microchip icon" block="MOREbot Blocks"
+//% weight=3 color=#ED672D icon="\f2db" block="MOREbot Blocks"
 //% groups=['Sensor', 'Servo', 'I2C']
 namespace morebot {
     const PCAADDRESS = 0x40
