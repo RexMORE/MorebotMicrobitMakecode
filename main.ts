@@ -120,7 +120,7 @@ namespace morebot {
     }
 
     //% blockID="MOREbot_servo_get" block="Get servo on pin %pin"
-    //% weight=1 color=#D60B3E group='Servo'
+    //% weight=1 group='Servo'
     export function getServo(pin: number): Servo {
         return new Servo(pin)
     }
