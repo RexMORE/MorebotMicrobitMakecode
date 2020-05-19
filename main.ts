@@ -44,26 +44,17 @@ namespace morebot {
     let pulsewidth = 4096
 
     //% emitAsConstant
-    enum DIGITALOUT {
-        //% blockID="MOREbot_digital_LOW" block="LOW"
+    enum digitalout {
+        //% block="LOW"
         Low = 0,
-        //% blockID="MOREbot_digital_HIGH" block="HIGH"
+        //% block="HIGH"
         High = 1
     }
 
-    //% shim=TD_ID
-    //% blockId="digital_level_shim"
-    //% block="%level"
-    export function digitalLevel(level: DIGITALOUT): number{
-        return level
-    }
-
-    //% enumIdentity="DIGITALOUT.Low"
-    //% blockIdentity="digitalLevel"
-    const LOW = DIGITALOUT.Low
-    //% enumIdentity="DIGITALOUT.High"
-    //% blockIdentity="digitalLevel"
-    const HIGH = DIGITALOUT.High
+    //% enumIdentity="digitalout.Low"
+    export const LOW = digitalout.Low
+    //% enumIdentity="digitalout.High"
+    export const HIGH = digitalout.High
 
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
     //% group='General' weight=0
