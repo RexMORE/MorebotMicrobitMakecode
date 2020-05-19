@@ -6,7 +6,7 @@
  * Functions to operate the the MOREbot Microbit Shield Ports.
  */
 //% weight=3 color=#ED672D icon="\uF2DB" block="MOREbot Blocks"
-//% groups=['General' Universal I/O', 'Servo', 'I2C']
+//% groups=['General', Universal I/O', 'Servo', 'I2C']
 namespace morebot {
     const PCAADDRESS = 0x40
     const ADSADDRESS = 0x17
@@ -40,6 +40,8 @@ namespace morebot {
     const ADSSEQCFGR = 0x10
     const ADSCHLSELR = 0x11
 
+    let threshold = 2047
+
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
     //% group='General' weight=0
     export function setup() {
@@ -55,7 +57,7 @@ namespace morebot {
         setPCAFreq(PCASTDFREQ)
     }
 
-    //% blockID="MOREbot_analog_read" block="Read Analog from port %pin"
+    //% blockID="MOREbot_analog_read" block="Read analog input from port %pin"
     //% group='Universal I/O'
     export function readAnalog(pin: number) {
         if(pin > 7 || pin < 0) return -1
@@ -64,6 +66,23 @@ namespace morebot {
         let ch = outputRAW & 0x000F
         let output = outputRAW>>4
         return output
+    }
+
+    //% blockID="MOREbot_digital_read" block="Read digital input from port %pin"
+    //% group='Universal I/O'
+    export function readDigital(pin: number) {
+        let aIn = readAnalog(pin)
+        if(aIn > threshold) return 1
+        else return 0
+    }
+
+    //% blockID="MOREbot_digital_threshSet" block="Set the digital HIGH threshold to %newThresh| from 0 to 4095"
+    //% advanced=true group='Universal I/O'
+    //% newThresh.min=0 newThresh.max=4095 newThresh.defl=2048
+    export function setDigitalReadLevel(newThresh: number){
+        if (newThresh < 0) threshold = 0
+        else if (newThresh > 4095) threshold = 4095
+        else threshold = newThresh
     }
 
     //% blockID="MOREbot_api_PCA_Freq" block="Set the operating frequency for the PWM outputs to %freq"
