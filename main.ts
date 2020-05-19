@@ -55,6 +55,7 @@ namespace morebot {
     }
 
     //% blockID="MOREbot_analog_read" block="Read Analog from port %pin"
+    //% group='Universal I/O'
     export function readAnalog(pin: number) {
         if(pin > 7 || pin < 0) return -1
         writeArrayI2C([ADSWRITREG, ADSCHLSELR, pin & 0x0F], ADSADDRESS)
