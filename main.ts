@@ -6,7 +6,7 @@
  * Functions to operate the the MOREbot Microbit Shield Ports.
  */
 //% weight=3 color=#ED672D icon="\uF2DB" block="MOREbot Blocks"
-//% groups=['Sensor', 'Servo', 'I2C']
+//% groups=['Universal I/O', 'Servo', 'I2C']
 namespace morebot {
     const PCAADDRESS = 0x40
     const ADSADDRESS = 0x17
@@ -21,16 +21,47 @@ namespace morebot {
 
     const PCAMODEALL = 0x01
     const PCAMODESLP = 0x10
-    const PCAMODEAI = 0x20
+    const PCAMODEAIN = 0x20
     const PCAMODERST = 0x80
+
+    const ADSGENCALL = 0x00
+    const ADSADDRRST = 0x04
+    const ADSSOFTRST = 0x06
+    const ADSWRITREG = 0x08
+    const ADSREADREG = 0x10
+
+    const ADSGENCFGR = 0x01
+    const ADSDATCFGR = 0x02
+    const ADSOPMCFGR = 0x04
+    const ADSPINCFGR = 0x05
+    const ADSGPICFGR = 0x07
+    const ADSGPIOUTR = 0x0B
+    const ADSGPIINPR = 0x0D
+    const ADSSEQCFGR = 0x10
+    const ADSCHLSELR = 0x11
 
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
     export function setup() {
+        writeArrayI2C([ADSWRITREG, ADSPINCFGR, 0x00], ADSADDRESS)
+
+        writeArrayI2C([ADSWRITREG, ADSSEQCFGR, 0x00], ADSADDRESS)
+        writeArrayI2C([ADSWRITREG, ADSOPMCFGR, 0x00], ADSADDRESS)
+
         writeArrayI2C([PCAMODEREG, PCAMODERST], PCAADDRESS)
 
         basic.pause(10)
 
         setPCAFreq(PCASTDFREQ)
+    }
+
+    //% blockID="MOREbot_analog_read" block="Read Analog from port %pin"
+    export function readAnalog(pin: number) {
+        if(pin > 7 || pin < 0) return -1
+        writeArrayI2C([ADSWRITREG, ADSCHLSELR, pin & 0x0F], ADSADDRESS)
+        let outputRAW = pins.i2cReadNumber(ADSADDRESS, NumberFormat.UInt16LE, false)
+        let ch = outputRAW & 0x000F
+        let output = outputRAW>>4
+        return output
     }
 
     //% blockID="MOREbot_api_PCA_Freq" block="Set the operating frequency for the PWM outputs to %freq"
