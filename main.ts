@@ -6,7 +6,7 @@
  * Functions to operate the the MOREbot Microbit Shield Ports.
  */
 //% weight=3 color=#ED672D icon="\uF2DB" block="MOREbot Blocks"
-//% groups=['Universal I/O', 'Servo', 'I2C']
+//% groups=['General' Universal I/O', 'Servo', 'I2C']
 namespace morebot {
     const PCAADDRESS = 0x40
     const ADSADDRESS = 0x17
@@ -41,6 +41,7 @@ namespace morebot {
     const ADSCHLSELR = 0x11
 
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
+    //% group='General' weight=0
     export function setup() {
         writeArrayI2C([ADSWRITREG, ADSPINCFGR, 0x00], ADSADDRESS)
 
