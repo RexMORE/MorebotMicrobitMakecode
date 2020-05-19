@@ -43,18 +43,13 @@ namespace morebot {
     let threshold = 2047
     let pulsewidth = 4096
 
-    //% emitAsConstant
-    enum digitalout {
+    //% block="digitalLevel"
+    export enum digitalout {
         //% block="LOW"
         Low = 0,
         //% block="HIGH"
         High = 1
     }
-
-    //% enumIdentity="digitalout.Low"
-    export const LOW = digitalout.Low
-    //% enumIdentity="digitalout.High"
-    export const HIGH = digitalout.High
 
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
     //% group='General' weight=0
@@ -86,13 +81,14 @@ namespace morebot {
     //% group='Universal I/O'
     export function readDigital(pin: number): number {
         let aIn = readAnalog(pin)
-        if (aIn > threshold) return HIGH
-        else return LOW
+        if (aIn > threshold) return digitalout.High
+        else return digitalout.Low
     }
 
     //% blockID="MOREbot_digital_write" block="Set port %pin| to digital value %level"
     //% group='Universal I/O'
-    export function writeDigital(pin: number, level: number = HIGH) {
+    //% level.defl=digitalout.High
+    export function writeDigital(pin: number, level: number = digitalout.High) {
         if (level > 1) level = 1
         else level = 0
         if (level) {
