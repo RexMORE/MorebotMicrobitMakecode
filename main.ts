@@ -43,6 +43,40 @@ namespace morebot {
     let threshold = 2047
     let pulsewidth = 4096
 
+    export enum uioports {
+        //% block="UI/O Port 1"
+        uio1 = 0,
+        //% block="UI/O Port 2"
+        uio2 = 1,
+        //% block="UI/O Port 3"
+        uio3 = 2,
+        //% block="UI/O Port 4"
+        uio4 = 3,
+        //% block="UI/O Port 5"
+        uio5 = 4,
+        //% block="UI/O Port 6"
+        uio6 = 5,
+        //% block="UI/O Port 7"
+        uio7 = 6,
+        //% block="UI/O Port 8"
+        uio8 = 7
+    }
+
+    //% blockId="uioportsout" block="%port"
+    //% group='Universal I/O' weight=60
+    export function uioportsout(port: uioports): number {
+        switch (port) {
+            case uioports.uio1: return 0;
+            case uioports.uio2: return 1;
+            case uioports.uio3: return 2;
+            case uioports.uio4: return 3;
+            case uioports.uio5: return 4;
+            case uioports.uio6: return 5;
+            case uioports.uio7: return 6;
+            case uioports.uio8: return 7;
+        }
+    }
+
     export enum digitalout {
         //% block="LOW"
         Low = 0,
@@ -51,7 +85,7 @@ namespace morebot {
     }
 
     //% blockId="digitalLevels" block="%level"
-    //% group='Universal I/O' weight = 51
+    //% group='Universal I/O' weight=49
     export function digitalLevels(level: digitalout): number {
         switch (level) {
             case digitalout.Low: return 0;
@@ -60,7 +94,7 @@ namespace morebot {
     }
 
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
-    //% group='General' weight=0
+    //% group='General' weight=100
     export function setup() {
         writeArrayI2C([ADSWRITREG, ADSPINCFGR, 0x00], ADSADDRESS)
 
@@ -74,7 +108,7 @@ namespace morebot {
         setPCAFreq(PCASTDFREQ)
     }
 
-    //% blockID="MOREbot_analog_read" block="Analog value on port %pin"
+    //% blockID="MOREbot_analog_read" block="Analog value on %pin=uioportsout"
     //% group='Universal I/O'
     export function readAnalog(pin: number): number {
         if (pin > 7 || pin < 0) return -1
@@ -85,7 +119,7 @@ namespace morebot {
         return output
     }
 
-    //% blockID="MOREbot_digital_read" block="Digital value on port %pin"
+    //% blockID="MOREbot_digital_read" block="Digital value on %pin=uioportsout"
     //% group='Universal I/O'
     export function readDigital(pin: number): number {
         let aIn = readAnalog(pin)
@@ -93,8 +127,8 @@ namespace morebot {
         else return digitalout.Low
     }
 
-    //% blockID="MOREbot_digital_write" block="Set port %pin| to digital value %level=digitalLevels"
-    //% group='Universal I/O' weight = 52
+    //% blockID="MOREbot_digital_write" block="Set %pin=uioportsout| to digital value %level=digitalLevels"
+    //% group='Universal I/O' weight=48
     export function writeDigital(pin: number, level: number = digitalout.High) {
         if (level > 1) level = 1
         else level = 0
@@ -139,7 +173,7 @@ namespace morebot {
         return pins.i2cReadNumber(PCAADDRESS, NumberFormat.UInt8LE)
     }
 
-    //% blockID="MOREbot_api_PCA_Write" block="Set the PWM waveform for the %pinNum|output to start at %pulseStart| and last for %pulseLength| out of 4095"
+    //% blockID="MOREbot_api_PCA_Write" block="Set the PWM waveform for %pinNum=uioportsout| to start at %pulseStart| and last for %pulseLength| out of 4095"
     //% advanced=true group='I2C'
     export function setPCA_PWM(pinNum: number, pulseStart: number, pulseLength: number) {
         if (pulseStart < 0) pulseStart = 0
@@ -160,6 +194,8 @@ namespace morebot {
         writeArrayI2C([PINREGONL, on, on >> 8, off, off >> 8], PCAADDRESS)
     }
 
+    //% blockID="MOREbot_api_PCA_WriteAll" block="Set the PWM waveform for all ports to start at %pulseStart| and last for %pulseLength| out of 4095"
+    //% advanced=true group='I2C'
     export function setPCA_ALLPWM(pulseStart: number, pulseLength: number) {
         let scrubPulse1 = pins.createBuffer(2)
         scrubPulse1.setNumber(NumberFormat.UInt16LE, 0, pulseStart)
@@ -205,7 +241,7 @@ namespace morebot {
         }
     }
 
-    //% blockID="MOREbot_servo_get" block="Get servo on pin %pin"
+    //% blockID="MOREbot_servo_get" block="Get servo on %pin=uioportsout"
     //% weight=1 group='Servo'
     export function getServo(pin: number): Servo {
         return new Servo(pin)
