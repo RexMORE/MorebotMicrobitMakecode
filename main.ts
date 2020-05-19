@@ -41,6 +41,14 @@ namespace morebot {
     const ADSCHLSELR = 0x11
 
     let threshold = 2047
+    let pulsewidth = 4096
+
+    enum DIGITALOUT {
+        //% blockID="MOREbot_digital_LOW" block="LOW"
+        LOW = 0,
+        //% blockID="MOREbot_digital_HIGH" block="HIGH"
+        HIGH = 1
+    }
 
     //% blockID="MOREbot_api_setup" block="Setup MOREbot Shield"
     //% group='General' weight=0
@@ -57,29 +65,39 @@ namespace morebot {
         setPCAFreq(PCASTDFREQ)
     }
 
-    //% blockID="MOREbot_analog_read" block="Read analog input from port %pin"
+    //% blockID="MOREbot_analog_read" block="Analog value on port %pin"
     //% group='Universal I/O'
-    export function readAnalog(pin: number) {
-        if(pin > 7 || pin < 0) return -1
+    export function readAnalog(pin: number) : number{
+        if (pin > 7 || pin < 0) return -1
         writeArrayI2C([ADSWRITREG, ADSCHLSELR, pin & 0x0F], ADSADDRESS)
         let outputRAW = pins.i2cReadNumber(ADSADDRESS, NumberFormat.UInt16LE, false)
         let ch = outputRAW & 0x000F
-        let output = outputRAW>>4
+        let output = outputRAW >> 4
         return output
     }
 
-    //% blockID="MOREbot_digital_read" block="Read digital input from port %pin"
+    //% blockID="MOREbot_digital_read" block="Digital value on port %pin"
     //% group='Universal I/O'
-    export function readDigital(pin: number) {
+    export function readDigital(pin: number) : number{
         let aIn = readAnalog(pin)
-        if(aIn > threshold) return 1
-        else return 0
+        if (aIn > threshold) return DIGITALOUT.HIGH
+        else return DIGITALOUT.LOW
+    }
+
+    //% blockID="MOREbot_digital_write" block="Set port %pin| to digital value %level"
+    //% group='Universal I/O'
+    export function writeDigital(pin: number, level: DIGITALOUT) {
+        if (level) {
+            setPCA_PWM(pin, 0, pulsewidth)
+        } else {
+            setPCA_PWM(pin, 0, 0)
+        }
     }
 
     //% blockID="MOREbot_digital_threshSet" block="Set the digital HIGH threshold to %newThresh| from 0 to 4095"
     //% advanced=true group='Universal I/O'
-    //% newThresh.min=0 newThresh.max=4095 newThresh.defl=2048
-    export function setDigitalReadLevel(newThresh: number){
+    //% newThresh.min=0 newThresh.max=4095 newThresh.defl=2047
+    export function setDigitalReadLevel(newThresh: number) {
         if (newThresh < 0) threshold = 0
         else if (newThresh > 4095) threshold = 4095
         else threshold = newThresh
@@ -110,9 +128,14 @@ namespace morebot {
         return pins.i2cReadNumber(PCAADDRESS, NumberFormat.UInt8LE)
     }
 
-    //% blockID="MOREbot_api_PCA_Write" block="Set the PWM waveform for the %pinNum|output to start at %pulseStart| and last for %pulseLength| out of 4096"
+    //% blockID="MOREbot_api_PCA_Write" block="Set the PWM waveform for the %pinNum|output to start at %pulseStart| and last for %pulseLength| out of 4095"
     //% advanced=true group='I2C'
     export function setPCA_PWM(pinNum: number, pulseStart: number, pulseLength: number) {
+        if (pulseStart < 0) pulseStart = 0
+        else if (pulseStart > pulsewidth) pulseStart = pulsewidth
+        if (pulseLength < 0) pulseLength = 0
+        else if (pulseLength > pulsewidth - pulsewidth) pulseLength = pulsewidth - pulseStart
+
         let PINREGONL = PCALED1REG + 4 * pinNum
 
         let scrubPulse1 = pins.createBuffer(2)
