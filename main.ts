@@ -67,7 +67,7 @@ namespace morebot {
 
     //% blockID="MOREbot_analog_read" block="Analog value on port %pin"
     //% group='Universal I/O'
-    export function readAnalog(pin: number) : number{
+    export function readAnalog(pin: number): number {
         if (pin > 7 || pin < 0) return -1
         writeArrayI2C([ADSWRITREG, ADSCHLSELR, pin & 0x0F], ADSADDRESS)
         let outputRAW = pins.i2cReadNumber(ADSADDRESS, NumberFormat.UInt16LE, false)
@@ -78,7 +78,7 @@ namespace morebot {
 
     //% blockID="MOREbot_digital_read" block="Digital value on port %pin"
     //% group='Universal I/O'
-    export function readDigital(pin: number) : number{
+    export function readDigital(pin: number): number {
         let aIn = readAnalog(pin)
         if (aIn > threshold) return DIGITALOUT.HIGH
         else return DIGITALOUT.LOW
@@ -86,7 +86,7 @@ namespace morebot {
 
     //% blockID="MOREbot_digital_write" block="Set port %pin| to digital value %level"
     //% group='Universal I/O'
-    export function writeDigital(pin: number, level: DIGITALOUT) {
+    export function writeDigital(pin: number, level: number = DIGITALOUT.HIGH) {
         if (level) {
             setPCA_PWM(pin, 0, pulsewidth)
         } else {
